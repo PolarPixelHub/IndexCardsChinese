@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import simpledialog, messagebox
 from flashcard_manager import FlashcardManager  # Your manager class
 import os
+import random
 
 
 class FlashcardApp:
@@ -194,8 +195,14 @@ class FlashcardApp:
             messagebox.showinfo("No Cards", "All cards have been guessed correctly 10 times or more!")
             return
 
-        self.current_index = (self.current_index + 1) % len(filtered_cards)
-        card = filtered_cards[self.current_index]
+        self.current_index = random.randint(0, len(self.manager.cards) -1)
+        card = self.manager.cards[self.current_index]
+
+        # Check if the chosen card still has correct_count > 10 and shuffle if necessary
+        while card["correct_count"] >= 10:
+            self.current_index= random.randint(0, len(self.manager.cards) -1)
+            card = self.manager.cards[self.current_index]
+
         if self.toggle_sides:
             self.card_label.config(text=card["side1"])  # Show side1
         else:

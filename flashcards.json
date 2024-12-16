@@ -2,14 +2,21 @@
     {
         "side1": "W\u01d2    \u6211",
         "side2": "I  ",
-        "correct_count": 0,
+        "correct_count": 6,
         "incorrect_count": 0,
         "difficulty_level": "normal"
     },
     {
         "side1": "N\u01d0 \u4f60",
         "side2": "You",
-        "correct_count": 3,
+        "correct_count": 13,
+        "incorrect_count": 0,
+        "difficulty_level": "normal"
+    },
+    {
+        "side1": "test 2",
+        "side2": "3",
+        "correct_count": 1,
         "incorrect_count": 0,
         "difficulty_level": "normal"
     }
