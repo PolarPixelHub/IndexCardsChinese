@@ -248,5 +248,18 @@ class FlashcardApp:
             else:
                 messagebox.showerror("Error", "No card selected.")
 
+        def reset_selected():
+            selected_index = card_listbox.curselection()
+            if selected_index:
+                index = selected_index[0]
+                self.manager.reset_card(index)
+                delete_window.destroy()
+                messagebox.showinfo("Reset", "Card reseted successfully.")
+            else:
+                messagebox.showerror("Error", "No card selected.")
+
         delete_button = tk.Button(delete_window, text="Delete Selected Card", command=delete_selected)
         delete_button.pack(pady=5)
+
+        reset_button = tk.Button(delete_window, text="Reset Selected Card", command=reset_selected)
+        reset_button.pack(pady=5)

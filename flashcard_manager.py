@@ -55,6 +55,12 @@ class FlashcardManager:
             self.update_difficulty(index)
             self.save_cards()
 
+    def reset_card(self, index):
+        self.cards[index]["incorrect_count"] = 0
+        self.cards[index]["correct_count"] = 0
+        self.update_difficulty(index)
+        self.save_cards()
+
     def update_difficulty(self, index):
         """Update difficulty level based on incorrect count."""
         incorrect_count = self.cards[index]["incorrect_count"]
