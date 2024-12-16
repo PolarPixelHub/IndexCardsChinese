@@ -1,28 +1,120 @@
 import tkinter as tk
-from tkinter import messagebox
-from flashcard_manager import FlashcardManager
+from tkinter import simpledialog, messagebox
+from flashcard_manager import FlashcardManager  # Your manager class
+import os
 
 
 class FlashcardApp:
-    def __init__(self, root, manager):
-        self.manager = manager
-        self.current_index = -1
+    def __init__(self, root):
         self.root = root
-        root.title("Flashcard App")
-        root.geometry("400x300")
+        self.manager = None  # Manager will load after project selection
+        self.current_index = -1
+        self.toggle_sides = True
 
-        self.toggle_sides = True  # To toggle between side1 and side2
-        self.show_start_options(root)
+        root.title("Flashcard App")
+        root.geometry("700x400")
+
+        self.show_project_selection()
+
+    def show_project_selection(self):
+        self.clear_root()
+        """Show a window for project selection or creation."""
+        project_window = tk.Frame(self.root)
+        project_window.pack(pady=50)
+
+        tk.Label(project_window, text="Select or Create a Project", font=("Arial", 16)).pack(pady=10)
+
+        self.project_listbox = tk.Listbox(project_window, width=30, height=8)
+        self.project_listbox.pack(pady=5)
+        self.load_project_list()
+
+        select_button = tk.Button(project_window, text="Select Project", command=self.select_project)
+        select_button.pack(pady=5)
+
+        create_button = tk.Button(project_window, text="Create New Project", command=self.create_project)
+        create_button.pack(pady=5)
+
+        delete_button = tk.Button(project_window, text="Delete Project", command=self.confirm_delete_project)
+        delete_button.pack(pady=5)
+
+    def confirm_delete_project(self):
+        """Prompt for confirmation before deleting a project."""
+        selected_index = self.project_listbox.curselection()
+        if not selected_index:
+            tk.messagebox.showerror("Error", "No project selected.")
+            return
+
+        project_name = self.project_listbox.get(selected_index)
+
+        # Confirmation dialog
+        confirm = tk.messagebox.askyesno(
+            "Confirm Deletion",
+            f"Are you sure you want to delete the project '{project_name}'?"
+        )
+        if confirm:
+            self.delete_project(selected_index, project_name)
+
+    def delete_project(self, selected_index, project_name):
+        """Delete the project file and update the list."""
+        try:
+            # Construct file path (adjust path logic if needed)
+            project_file = os.path.join("D:\\Coding\\IndexCards", f"{project_name}")
+            os.remove(project_file)
+
+            # Remove project from listbox
+            self.project_listbox.delete(selected_index)
+            tk.messagebox.showinfo("Success", f"Project '{project_name}' has been deleted.")
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
+    def load_project_list(self):
+        """Load all project files in the current directory."""
+        self.project_files = [f for f in os.listdir() if f.endswith(".json")]
+        self.project_listbox.delete(0, tk.END)
+        for file in self.project_files:
+            self.project_listbox.insert(tk.END, file)
+
+    def select_project(self):
+        """Load the selected project."""
+        selected_index = self.project_listbox.curselection()
+        if selected_index:
+            project_file = self.project_files[selected_index[0]]
+            self.manager = FlashcardManager(project_file)
+            messagebox.showinfo("Success", f"Loaded project: {project_file}")
+            self.clear_root()
+            self.show_start_options(self.root)
+        else:
+            messagebox.showerror("Error", "Please select a project.")
+
+    def create_project(self):
+        """Create a new project with a unique name."""
+        project_name = simpledialog.askstring("New Project", "Enter project name:")
+        if project_name:
+            project_file = f"{project_name}.json"
+            if os.path.exists(project_file):
+                messagebox.showerror("Error", "Project already exists!")
+            else:
+                open(project_file, "w").close()  # Create an empty JSON file
+                messagebox.showinfo("Success", f"Project '{project_file}' created!")
+                self.load_project_list()
+        else:
+            messagebox.showerror("Error", "Project name cannot be empty.")
+
+    def clear_root(self):
+        """Clear all widgets from the root window."""
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
     def show_start_options(self, root):
+        """Main options: Add Card or Learn."""
         start_frame = tk.Frame(root)
         start_frame.pack(pady=50)
 
-        add_card_button = tk.Button(start_frame, text="Add Card", command=self.show_add_card_window)
-        add_card_button.pack(pady=10)
+        tk.Button(start_frame, text="Add Card", command=self.show_add_card_window).pack(pady=10)
+        tk.Button(start_frame, text="Learn", command=self.show_learn_window).pack(pady=10)
+        tk.Button(start_frame, text="Change Projects", command=self.show_project_selection).pack(pady=10)
 
-        learn_button = tk.Button(start_frame, text="Learn", command=self.show_learn_window)
-        learn_button.pack(pady=10)
+
 
     def show_add_card_window(self):
         add_window = tk.Toplevel()
