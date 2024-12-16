@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-
+from flashcard_manager import FlashcardManager
 
 class FlashcardApp:
     def __init__(self, root, manager):
@@ -30,9 +30,11 @@ class FlashcardApp:
         self.flip_button = tk.Button(root, text="Flip Card", command=self.flip_card)
         self.flip_button.pack(pady=5)
 
-        # Add this button to your __init__ method
         self.correct_button = tk.Button(root, text="Mark Correct", command=self.mark_correct)
         self.correct_button.pack(pady=5)
+
+        self.delete_window_button = tk.Button(root, text="Manage Cards", command=self.open_delete_window)
+        self.delete_window_button.pack(pady=5)
 
     def add_card(self):
         side1 = self.input_side1.get()
@@ -46,18 +48,14 @@ class FlashcardApp:
             messagebox.showerror("Error", "Both fields must be filled.")
 
     def show_next_card(self):
-        # Filter cards where 'correct_count' is less than 10
         filtered_cards = [card for card in self.manager.cards if card["correct_count"] < 10]
 
         if not filtered_cards:
             messagebox.showinfo("No Cards", "All cards have been guessed correctly 10 times or more!")
             return
 
-        # Cycle through filtered cards
         self.current_index = (self.current_index + 1) % len(filtered_cards)
         self.card_label.config(text=filtered_cards[self.current_index]["side1"])
-
-        # Keep track of the index within the original cards
         self.original_index = self.manager.cards.index(filtered_cards[self.current_index])
 
     def flip_card(self):
@@ -78,3 +76,42 @@ class FlashcardApp:
             self.manager.mark_correct(self.original_index)
             count = self.manager.cards[self.original_index]["correct_count"]
             messagebox.showinfo("Correct Guess", f"Correct count: {count}")
+
+    def open_delete_window(self):
+        delete_window = tk.Toplevel()
+        delete_window.title("Delete a Card")
+        delete_window.geometry("600x400")
+
+        card_listbox = tk.Listbox(delete_window, width=50, height=15)
+        card_listbox.pack(pady=10)
+
+        for i, card in enumerate(self.manager.cards):
+            card_listbox.insert(tk.END, f"{i + 1}: {card['side1']} - {card['side2']} (Count: {card['correct_count']})")
+
+        def delete_selected():
+            selected_index = card_listbox.curselection()
+            if selected_index:
+                index = selected_index[0]
+                self.manager.delete_card(index)
+                delete_window.destroy()
+                messagebox.showinfo("Deleted", "Card deleted successfully.")
+            else:
+                messagebox.showerror("Error", "No card selected.")
+
+        def reset_count():
+            selected_index = card_listbox.curselection()
+            if selected_index:
+                index = selected_index[0]
+                self.manager.cards[index]["correct_count"] = 0
+                self.manager.save_cards()
+                messagebox.showinfo("Reset", "Correct count reset successfully.")
+                delete_window.destroy()
+                self.open_delete_window()  # Reload the window
+
+        delete_button = tk.Button(delete_window, text="Delete Selected Card", command=delete_selected)
+        delete_button.pack(pady=5)
+
+        reset_button = tk.Button(delete_window, text="Reset Correct Count", command=reset_count)
+        reset_button.pack(pady=5)
+
+

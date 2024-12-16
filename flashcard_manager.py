@@ -1,8 +1,9 @@
 import json
 import os
 
+
 class FlashcardManager:
-    def __init__(self, file_name="flashcards.json"):
+    def __init__(self, file_name="flashcards.json", app=None):
         self.file_name = file_name
         self.cards = self.load_cards()
 
@@ -23,4 +24,9 @@ class FlashcardManager:
     def mark_correct(self, index):
         if 0 <= index < len(self.cards):
             self.cards[index]["correct_count"] += 1
+            self.save_cards()
+
+    def delete_card(self, index):
+        if 0 <= index < len(self.cards):
+            del self.cards[index]
             self.save_cards()
