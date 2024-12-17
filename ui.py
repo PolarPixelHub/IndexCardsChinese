@@ -121,10 +121,11 @@ class FlashcardApp:
         for card in self.manager.cards:
             delta = 7 * card["time_periods"]
             card["last_correct_time"] = datetime.fromisoformat(card["last_correct_time"])
-            print(datetime.now() - card["last_correct_time"])
             if datetime.now() - card["last_correct_time"] > timedelta(days=delta):
                 card["correct_count"] = 9
                 card["time_periods"] += 1
+                if card["time_periods"] > 9:
+                    card["time_periods"] = 9
 
 
     def show_add_card_window(self):
