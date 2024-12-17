@@ -119,8 +119,15 @@ class FlashcardApp:
 
     def check_last_correct_date(self):
         for card in self.manager.cards:
+            if not card.get("last_correct_time"):
+                continue
+            try:
+                # Convert last_correct_time from ISO format
+                card["last_correct_time"] = datetime.fromisoformat(card["last_correct_time"])
+            except ValueError:
+                # Skip cards with invalid date formats
+                continue
             delta = 7 * card["time_periods"]
-            card["last_correct_time"] = datetime.fromisoformat(card["last_correct_time"])
             if datetime.now() - card["last_correct_time"] > timedelta(days=delta):
                 card["correct_count"] = 9
                 card["time_periods"] += 1
