@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime, timedelta
 
 
 class FlashcardManager:
@@ -35,7 +36,9 @@ class FlashcardManager:
             "side2": side2,
             "correct_count": 0,
             "incorrect_count": 0,
-            "difficulty_level": "normal"
+            "difficulty_level": "normal",
+            "last_correct_time": None,
+            "time_periods": 1
         })
         self.save_cards()
 
@@ -44,6 +47,7 @@ class FlashcardManager:
         if 0 <= index < len(self.cards):
             self.cards[index]["correct_count"] += 1
             self.cards[index]["incorrect_count"] = 0
+            self.cards[index]["last_correct_time"] = datetime.now().isoformat()
             self.update_difficulty(index)
             self.save_cards()
 

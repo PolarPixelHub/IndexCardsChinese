@@ -3,6 +3,7 @@ from tkinter import simpledialog, messagebox
 from flashcard_manager import FlashcardManager  # Your manager class
 import os
 import random
+from datetime import datetime, timedelta
 
 
 class FlashcardApp:
@@ -81,6 +82,7 @@ class FlashcardApp:
         if selected_index:
             project_file = self.project_files[selected_index[0]]
             self.manager = FlashcardManager(project_file)
+            self.check_last_correct_date()
             messagebox.showinfo("Success", f"Loaded project: {project_file}")
             self.clear_root()
             self.show_start_options(self.root)
@@ -115,6 +117,14 @@ class FlashcardApp:
         tk.Button(start_frame, text="Learn", command=self.show_learn_window).pack(pady=10)
         tk.Button(start_frame, text="Change Projects", command=self.show_project_selection).pack(pady=10)
 
+    def check_last_correct_date(self):
+        for card in self.manager.cards:
+            delta = 7 * card["time_periods"]
+            card["last_correct_time"] = datetime.fromisoformat(card["last_correct_time"])
+            print(datetime.now() - card["last_correct_time"])
+            if datetime.now() - card["last_correct_time"] > timedelta(days=delta):
+                card["correct_count"] = 9
+                card["time_periods"] += 1
 
 
     def show_add_card_window(self):
@@ -193,15 +203,18 @@ class FlashcardApp:
 
         if not filtered_cards:
             messagebox.showinfo("No Cards", "All cards have been guessed correctly 10 times or more!")
+            self.current_index = -1
+            card = None
+            self.card_label.config(text="No cards available")
             return
-
-        self.current_index = random.randint(0, len(self.manager.cards) -1)
-        card = self.manager.cards[self.current_index]
-
-        # Check if the chosen card still has correct_count > 10 and shuffle if necessary
-        while card["correct_count"] >= 10:
-            self.current_index= random.randint(0, len(self.manager.cards) -1)
+        else:
+            self.current_index = random.randint(0, len(self.manager.cards) -1)
             card = self.manager.cards[self.current_index]
+
+            # Check if the chosen card still has correct_count > 10 and shuffle if necessary
+            while card["correct_count"] >= 10:
+                self.current_index= random.randint(0, len(self.manager.cards) -1)
+                card = self.manager.cards[self.current_index]
 
         if self.toggle_sides:
             self.card_label.config(text=card["side1"])  # Show side1

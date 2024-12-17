@@ -1,23 +1,11 @@
 [
     {
-        "side1": "W\u01d2    \u6211",
-        "side2": "I  ",
-        "correct_count": 6,
+        "side1": "Enter Chinese Character + Pinyin",
+        "side2": "Enter English Translation",
+        "correct_count": 10,
         "incorrect_count": 0,
-        "difficulty_level": "normal"
-    },
-    {
-        "side1": "N\u01d0 \u4f60",
-        "side2": "You",
-        "correct_count": 13,
-        "incorrect_count": 0,
-        "difficulty_level": "normal"
-    },
-    {
-        "side1": "test 2",
-        "side2": "3",
-        "correct_count": 1,
-        "incorrect_count": 0,
-        "difficulty_level": "normal"
+        "difficulty_level": "normal",
+        "last_correct_time": "2024-12-17T09:49:21.201924",
+        "time_periods": 3
     }
 ]
